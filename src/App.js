@@ -1,23 +1,48 @@
-import logo from './logo.svg';
 import './App.css';
+import useSetupGameBoard from './Logic/setupGameBoard';
+import {useSelector, useDispatch} from 'react-redux'
+import Tile from './Components/Tile';
+import store from './Redux/store';
+import React, { useEffect, useState } from 'react';
+import { setupBoard } from './Redux/Reducers/tilesReducer';
+import { organizeBoard } from './Logic/miscellaneous';
 
 function App() {
+  const [gameBoard, setGameboard] = useState([])
+  const [reset, setReset] = useState(false)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(setupBoard())
+  }, [])
+
+  useEffect(() => {
+    setGameboard(store.getState().tiles)
+  }, [reset])
+
+  const resetTime = () => {
+    setReset(!reset)
+  }
+
+  const organizedBoard = organizeBoard(gameBoard)
+
+  let i = 0;
+
+    
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <div className = 'gameBoardContainer'>
+            {
+            //gameBoard.map(key => key)
+            //Gets gameboard from state after actions have been done on it
+            //game board produced by createGameBoard will be used by setupGameBoard to act as initial state
+            //guccho gang
+            organizedBoard.map((key) => {
+              i++
+              return <Tile data = {key} reset = {resetTime} key = {i}/>
+            })
+            }
+        </div>
     </div>
   );
 }
