@@ -4,7 +4,7 @@ import bishopB from '../Assets/bishop_black.png'
 import pawnB from '../Assets/pawn_black.png'
 import kingB from '../Assets/king_black.png'
 import queenB from '../Assets/queen_black.png'
-import rookB from '../Assets/rook_white.png'
+import rookB from '../Assets/rook_black.png'
 import knightB from '../Assets/knight_black.png'
 import knightW from '../Assets/knight_white.png'
 import rookW from '../Assets/rook_white.png'
@@ -97,28 +97,29 @@ const Tile = ({data, reset}) => {
     useSetActivePiece(content)
 
     //Sets img src
+    const colour = data.currentPieceColour === 'WHITE'
     switch(currentPiece){
         case 'PAWN':
-            pieceThing = pawnB
+            pieceThing = colour ? pawnW : pawnB
             break;
 
         case 'KING':
-            pieceThing = kingB
+            pieceThing = colour ? kingW : kingB
             break;
 
         case 'QUEEN': 
-            pieceThing = queenB
+            pieceThing = colour ? queenW : queenB
             break;
 
         case 'ROOK':
-            pieceThing = rookB
+            pieceThing = colour ? rookW : rookB
             break;
 
         case 'KNIGHT': 
-            pieceThing = knightB
+            pieceThing = colour ? knightW : knightB
             break;
         case 'BISHOP':
-            pieceThing = bishopB
+            pieceThing = colour ? bishopW : bishopB
             break;           
     }
     return(
