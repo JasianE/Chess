@@ -14,7 +14,7 @@ import queenW from '../Assets/queen_white.png'
 import { useSetActivePiece } from '../Redux/Hooks/tileReducerActions'
 import store from '../Redux/store'
 import { useDispatch } from "react-redux"
-import { movePiece } from '../Redux/Reducers/tilesReducer'
+import { movePiece, castle } from '../Redux/Reducers/tilesReducer'
 
 //Takes in state to determine which things have an on thing and which thing is on
 //Complicated
@@ -23,7 +23,7 @@ const Tile = ({data, reset}) => {
     const [switch2, setSwitch2] = useState(false)
     const dispatch = useDispatch()
 
-    const {x,y,currentPiece,activePiece,pieceFunctions, currentPieceColour} = data
+    const {x,y,currentPiece,activePiece } = data
 
     //Set image src
     let pieceThing = ''
@@ -41,35 +41,50 @@ const Tile = ({data, reset}) => {
             if(myPiece){
                 const state = {
                     coordinates: {x:myPiece.x, y: myPiece.y},
-                    colour: myPiece.currentPieceColour
+                    colour: myPiece.currentPieceColour,
+                    moved: myPiece.pieceFunctions.moved
                 } 
                 let possibleMoves = []
                 switch(myPiece.currentPiece){
                     case 'PAWN':
+                        //Black pawns in after starting tile cant do anything
                         possibleMoves.push(myPiece.pieceFunctions.pawnMoves(state, store.getState().tiles))
                         break;
                     case 'QUEEN':
-                        possibleMoves.push(myPiece.pieceFunctions.queenMoves(state))
+                        possibleMoves.push(myPiece.pieceFunctions.queenMoves(state, store.getState().tiles))
                         break;
                     case 'BISHOP':
-                        possibleMoves.push(myPiece.pieceFunctions.diagonalMoves(state))
+                        possibleMoves.push(myPiece.pieceFunctions.diagonalMoves(state, store.getState().tiles))
                         break;
                     case 'KNIGHT':
                         possibleMoves.push(myPiece.pieceFunctions.knightMoves(state))
                         break;
                     case 'ROOK':
-                        possibleMoves.push(myPiece.pieceFunctions.verticalHorizontalMoves(state))
+                        possibleMoves.push(myPiece.pieceFunctions.verticalHorizontalMoves(state, 
+                            store.getState().tiles, true))
                         break;
+                    case 'KING':
+                        possibleMoves.push(myPiece.pieceFunctions.kingMoves(state, store.getState().tiles))
                 }
                 const theRealG = possibleMoves[0].find((key) => {
                     return key.x === x && key.y === y
                 })
+
+                let castles2 = []
+                
+                if(theRealG){castles2 = [{x: 7, y: 6},{x: 7, y: 2},{x: 0, y: 6},{x: 0, y: 2}]
+                .find(key => key.x === theRealG.x && 
+                    key.y === theRealG.y)}
+                
                 const theActualDataNeededForMovePiece = {
                     pieceCoordinates: myPiece,
                     pieceType: myPiece.currentPiece,
-                    to: theRealG
+                    to: theRealG ? theRealG : null
                 }
-                if(theRealG){
+
+                if(myPiece.currentPiece === 'KING' && castles2 && myPiece.pieceFunctions.times < 2){
+                    dispatch(castle(theActualDataNeededForMovePiece))
+                } else if(theRealG){
                     dispatch(movePiece(theActualDataNeededForMovePiece))
                 }
             }

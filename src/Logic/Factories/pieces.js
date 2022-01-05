@@ -1,4 +1,5 @@
-import { createPiece, diagonalMovement, verticalHorizontalMovement, pawnMovement, knightMovement, coolFunction } from "./index";
+import { createPiece, diagonalMovement, 
+    verticalHorizontalMovement, pawnMovement, knightMovement, coolFunction, kingFunctions} from "./index";
 
 //State is uh coordinates and uh piece name
 export const createBishop = (state) => {
@@ -49,6 +50,15 @@ export const createKnight = (state) => {
     return newPiece
 }
 
+export const createKing = (state) => {
+    const newPiece = Object.assign(
+        {},
+        createPiece(state),
+        kingFunctions()
+    )
+    return newPiece
+}
+
 const createWhich = (state) => {
     switch(state.piece){
         case 'KNIGHT':
@@ -66,6 +76,9 @@ const createWhich = (state) => {
         case 'ROOK':
             const rook = createRook(state)
             return rook
+        case 'KING':
+            const king = createKing(state)
+            return king
     }
 }
 

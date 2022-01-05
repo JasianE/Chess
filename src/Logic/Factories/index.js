@@ -1,21 +1,64 @@
-export const createPiece = ({coordinates, piece=null}) => {
+//Functions used by every function
+
+const checker = (arr, gameboard, currentLocation=null) => {
+    //Returns first tile that is occupied
+    //Calls remover
+
+    //Removes current location if present i.e if piece is at 7:7 it will remove 7:7
+    if(currentLocation){
+        let where = 0
+        const res = arr.find((key) => {
+            where = where + 1
+            if(key.x === currentLocation.x && key.y === currentLocation.y){
+                return key
+            }
+        })
+        if(res){arr.splice(where - 1, 1)}
+    }
+    //Find the reference to the piece in gamebaord
+  
+    const piece = arr.find((key) => {
+        const pieceReference = gameboard.find((key1) => {return key1.x === key.x && key1.y === key.y})
+        if(pieceReference.currentPiece !== false){return key}
+    })
+    return remover(arr, piece)
+}
+const remover = (arr, piece) => {
+    //epic function names
+    let faker = [...arr]
+    faker = faker.slice(faker.indexOf(piece))
+    if(arr.indexOf(piece) !== -1){
+        return arr.filter((key) => {
+            if(faker.indexOf(key) === -1){return key}
+        })
+    }
+    return arr
+}
+
+export const createPiece = ({coordinates, piece=null, moved=false}) => {
     return {
         coordinates,
         isDead: false,
         piece: piece,
         die: function(){
             this.isDead = true
-        }
+        },
+        moved,
+        times: 0
     }
 }
 
 export const diagonalMovement = () => ({
-    diagonalMoves: function(state){
+    diagonalMoves: function(state, gameboard){
         //Two diagonals possible
         //while loop per diagonal
         //Store possible moves in array
         //add checking ofr occupied spaces
-        let possibleMoves = []
+
+        let topRight1 = []
+        let topLeft1 = []
+        let topRight2 = []
+        let topLeft2 = []
         
         let newX1 = state.coordinates.x + 1
         let newX2 = state.coordinates.x - 1
@@ -29,12 +72,12 @@ export const diagonalMovement = () => ({
 
         for(let i = 0; i < 8; i++){
             if((newX1 < 8 && newX1 > -1) && (newY1 < 8 && newY1 > -1)){
-                possibleMoves.push({x: newX1, y: newY1})
+                topRight1.push({x: newX1, y: newY1})
                 newX1 = newX1 + 1
                 newY1 = newY1 + 1
             }
             if((newX2 < 8 && newX2 > -1) && (newY2 < 8 && newY2 > -1)){
-                possibleMoves.push({x: newX2, y: newY2})
+                topRight2.push({x: newX2, y: newY2})
                 newX2 = newX2 - 1
                 newY2 = newY2 - 1
             }
@@ -42,40 +85,65 @@ export const diagonalMovement = () => ({
 
         for(let i = 0; i < 8; i++){
             if((newX3 < 8 && newX3 > -1) && (newY3 < 8 && newY3 > -1)){
-                possibleMoves.push({x: newX3, y: newY3})
+                topLeft1.push({x: newX3, y: newY3})
                 newX3 = newX3 - 1
                 newY3 = newY3 + 1
             }
             if((newX4 < 8 && newX4 > -1) && (newY4 < 8 && newY4 > -1)){
-                possibleMoves.push({x: newX4, y: newY4})
+                topLeft2.push({x: newX4, y: newY4})
                 newX4 = newX4 + 1
                 newY4 = newY4 - 1
             }
         }
+    
+        //Find the first piece that is occupied and records its x and y
+        //Delete every move that is greater than or less than (depends on which one) that move
+        topRight1 = checker(topRight1.sort((a,b) => {return a.x - b.x}), gameboard)
+        topLeft1 = checker(topLeft1.sort((a,b) => {return b.x - a.x}), gameboard)
+        topRight2 = checker(topRight2.sort((a,b) => {return b.x - a.x}), gameboard)
+        topLeft2 = checker(topLeft2.sort((a,b) => {return a.x - b.x}), gameboard)
         
-        return possibleMoves
+        return [...topRight1, ...topRight2, ...topLeft1, ...topLeft2]
     }
 })
 
 export const verticalHorizontalMovement = () => ({
     //Add checking for moves occupied + current move
-    verticalHorizontalMoves: function(state){
-        let possibleMoves = []
-
+    verticalHorizontalMoves: function(state, gameboard, poo=false){
+        //refactor later
+        let vertical1 = []
+        let horizontal1 = []
+        let vertical2 = []
+        let horizontal2 = []
         
-        for(let i = 0; i < 8; i++){
-            possibleMoves.push({x: state.coordinates.x, y: i})
-            possibleMoves.push({x: i, y: state.coordinates.y})
+        for(let i = 0; i < state.coordinates.x; i++){
+            vertical1.push({x: i, y: state.coordinates.y})
+        }
+        for(let i = state.coordinates.x; i < 8; i++){
+            vertical2.push({x: i, y: state.coordinates.y})
+        }
+        for(let i = state.coordinates.y; i < 8; i++){
+            horizontal2.push({x: state.coordinates.x, y: i})
+        }
+        for(let i = 0; i < state.coordinates.y; i++){
+            horizontal1.push({x: state.coordinates.x, y: i})
         }
 
-        return possibleMoves
+        vertical1 = checker(vertical1.reverse(), gameboard, {x: state.coordinates.x, y: state.coordinates.y})
+        horizontal1 = checker(horizontal1.reverse(), gameboard, {x: state.coordinates.x, y: state.coordinates.y})
+        vertical2 = checker(vertical2, gameboard, {x: state.coordinates.x, y: state.coordinates.y})
+        horizontal2 = checker(horizontal2, gameboard, {x: state.coordinates.x, y: state.coordinates.y})
+
+        if(poo){this.moved = true} 
+
+        return [...vertical1, ...horizontal1, ...vertical2, ...horizontal2]
     }
 })
 
 export const coolFunction = () => ({
-    queenMoves: function(state){
-        const horizontalVertical = this.verticalHorizontalMoves(state)
-        const diagonal = this.diagonalMoves(state)
+    queenMoves: function(state, gameboard){
+        const horizontalVertical = this.verticalHorizontalMoves(state, gameboard)
+        const diagonal = this.diagonalMoves(state, gameboard)
         const possibleMoves = [...horizontalVertical, ...diagonal]
 
         return possibleMoves
@@ -83,8 +151,10 @@ export const coolFunction = () => ({
 })
 export const pawnMovement = () => ({
     //rfeactor tjis
-    pawnMoves: function(state, currentBoard){
+    pawnMoves: function(state, currentBoard, cool = false){
         let possibleMoves = []
+        let adjacents5 = [{x: state.coordinates.x+1, y: state.coordinates.y - 1}, 
+            {x: state.coordinates.x+1, y: state.coordinates.y + 1}]
         if(state.colour === 'WHITE'){
             if(state.coordinates.x === 6){
                 let one = {
@@ -118,6 +188,7 @@ export const pawnMovement = () => ({
                         })
                         if(adjacent2.currentPieceColour === 'BLACK'){possibleMoves.push(adjacent2)}
                     }
+                    possibleMoves.push({x: state.coordinates.x -1, y: state.coordinates.y})
                 }
             }
         } else {
@@ -139,24 +210,27 @@ export const pawnMovement = () => ({
                     const adjacents = [{x: state.coordinates.x+1, y: state.coordinates.y - 1}, 
                         {x: state.coordinates.x+1, y: state.coordinates.y + 1}]
                     
-                    const adjacent1 = currentBoard.find((key) => {
-                        if(key.x === adjacents[0].x && key.y === adjacents[0].y){
-                            return key
-                        }
-                    }).currentPieceColour === 'WHITE'
-
-                    const adjacent2 = currentBoard.find((key) => {
-                        if(key.x === adjacents[1].x && key.y === adjacents[1].y){
-                            return key
-                        }
-                    }).currentPieceColour === 'WHITE'
-    
-                    if(adjacent1){possibleMoves.push(adjacent1)}
-                    if(adjacent2){possibleMoves.push(adjacent2)}
+                    if(adjacents[0].x > -1 && adjacents[0].x < 8 && adjacents[0].y < 8 && adjacents[0].y > -1){
+                        const adjacent1 = currentBoard.find((key) => {
+                            if(key.x === adjacents[0].x && key.y === adjacents[0].y){
+                                return key
+                            }
+                        })
+                        if(adjacent1.currentPieceColour === 'BLACK'){possibleMoves.push(adjacent1)}
+                    }
+                    if(adjacents[1].x > -1 && adjacents[1].x < 8 && adjacents[1].y < 8 && adjacents[1].y > -1){
+                        const adjacent2 = currentBoard.find((key) => {
+                            if(key.x === adjacents[1].x && key.y === adjacents[1].y){
+                                return key
+                            }
+                        })
+                        if(adjacent2.currentPieceColour === 'BLACK'){possibleMoves.push(adjacent2)}
+                    }
+                    possibleMoves.push({x: state.coordinates.x + 1, y: state.coordinates.y})
                 }
             }
         }
-        return possibleMoves
+        return cool ? adjacents5 : possibleMoves
     }
 })
 
@@ -204,4 +278,108 @@ export const knightMovement = () => ({
     }
     return possibleMoves
     }
+})
+
+export const kingFunctions = () => ({
+    kingChecker: function(gameboard, pieceLocation){
+        //Checks gameboard to see where checks are to the king B)))))))))
+        //Tells you where check is i.e 7,7 2,2, 1,1 
+        //Other sht
+        //Im tired
+        //Find all potential threats 1 first, (queen, rook, bishop)
+        //determine if there is a check from these three
+        //Then check knight and pawn
+        const {x,y} = pieceLocation
+
+        const bishopsQueensRooks = gameboard.filter((key) => {
+            return pieceLocation.colour === 'WHITE' ? (key.currentPiece === 'ROOK' && key.currentPieceColour === 'BLACK') 
+            || (key.currentPiece === 'QUEEN' && key.currentPieceColour === 'BLACK') || (key.currentPiece === 'BISHOP' &&
+            key.currentPieceColour === 'BLACK') || (key.currentPiece === 'PAWN' &&
+            key.currentPieceColour === 'BLACK') || (key.currentPiece === 'KNIGHT' &&
+            key.currentPieceColour === 'BLACK'): (key.currentPiece === 'ROOK' && key.currentPieceColour === 'WHITE') 
+            || (key.currentPiece === 'QUEEN' && key.currentPieceColour === 'WHITE') || (key.currentPiece === 'BISHOP' &&
+            key.currentPieceColour === 'WHITE') || (key.currentPiece === 'PAWN' &&
+            key.currentPieceColour === 'BLACK') || (key.currentPiece === 'KNIGHT' &&
+            key.currentPieceColour === 'WHITE')
+        })
+
+        const potentialChecks = [{x, y}, {x: x + 1, y}, {x: x+1, y: y+1}, {x: x+1, y:y-1}, {x, y: y+1},
+        {x: x-1, y:y+1}, {x: x-1, y}, {x: x-1, y: y-1}, {x, y: y-1}].filter(key => key.x > -1 && key.x < 8 && key.y > -1 && 
+            key.y < 8)
+
+        let realCoveredTiles = []
+
+        const coveredTiles = bishopsQueensRooks.map((key) => {
+            const state = {
+                coordinates: {x: key.x, y: key.y},
+                colour: key.colour
+            }
+            switch(key.currentPiece){
+                case 'QUEEN':
+                    return key.pieceFunctions.queenMoves(state, gameboard)
+                case 'ROOK':
+                    return key.pieceFunctions.verticalHorizontalMoves(state, gameboard)
+                case 'BISHOP':
+                    return key.pieceFunctions.diagonalMoves(state, gameboard)
+                case 'PAWN':
+                    return key.pieceFunctions.pawnMoves(state, gameboard, true)
+                case 'KNIGHT':
+                    return key.pieceFunctions.knightMoves(state)
+            }
+        })
+
+        for(let j = 0; j < coveredTiles.length; j++){
+            for(let k = 0; k < coveredTiles[j].length; k++){
+                realCoveredTiles.push(coveredTiles[j][k])
+            }
+        }
+
+        return {checks: potentialChecks.filter((key) => {
+            if(realCoveredTiles.find(poop => poop.x === key.x && poop.y === key.y)){return key} 
+        }), moves: potentialChecks}
+    },
+    kingMoves: function(state, gameboard){
+        //Uses kingchecker to determine if you an movel lmao
+        const {checks, moves} = this.kingChecker(gameboard, {x: state.coordinates.x, y: state.coordinates.y, 
+            colour: state.colour})
+        let doubleDouble = moves.filter((key) => {
+            if(!checks.find(poop => poop.x === key.x && poop.y === key.y)){return key}
+        })
+
+        this.moved = true
+        this.times = this.times + 1
+        
+
+        const rooks = gameboard.filter(key => key.currentPiece === 'ROOK' && key.pieceFunctions.moved === false && 
+        key.currentPieceColour === state.colour).sort((a,b) => a.y - b.y)
+        //REfactor this (if statement stuff into a function)
+        if(state.colour === 'WHITE' && state.moved === false){
+            const piecesOfConcern = gameboard.filter(key => (key.x === 7 && key.y === 6) || (key.x === 7 && key.y === 2) ||
+            (key.x === 7 && key.y === 5) || (key.x === 7 && key.y === 3) || (key.x === 7 && key.y === 1)).sort((a,b) => {
+                return a.y - b.y
+            })
+            const leftCastle = piecesOfConcern.slice(0, 3).filter(key => key.currentPiece === false)
+            const rightCastle = piecesOfConcern.slice(3, 6).filter(key => key.currentPiece === false)
+
+            if(rightCastle.length === 2 && rooks[1].pieceFunctions.moved === false){
+                doubleDouble.push({x: 7, y: 6})
+            } else if(leftCastle.length === 3 && rooks[0].pieceFunctions.moved === false){
+                doubleDouble.push({x: 7, y: 2})
+            }
+        } else if(state.colour === 'BLACK' && state.moved === false){
+            const piecesOfConcern = gameboard.filter(key => (key.x === 0 && key.y === 6) || (key.x === 0 && key.y === 2) ||
+            (key.x === 0 && key.y === 5) || (key.x === 0 && key.y === 3) || (key.x === 0 && key.y === 1)).sort((a,b) => {
+                return a.y - b.y
+            })
+            const leftCastle = piecesOfConcern.slice(0, 3).filter(key => key.currentPiece === false)
+            const rightCastle = piecesOfConcern.slice(3, 6).filter(key => key.currentPiece === false)
+
+            if(rightCastle.length === 2 && rooks[1].pieceFunctions.moved === false){
+                doubleDouble.push({x: 0, y: 6})
+            } else if(leftCastle.length === 3 && rooks[0].pieceFunctions.moved === false){
+                doubleDouble.push({x: 0, y: 2})
+            }
+        }
+        return doubleDouble
+    },
 })

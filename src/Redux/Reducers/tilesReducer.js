@@ -1,4 +1,5 @@
 import createGameBoard from "../../Logic/createGameBoard"
+import { kingFunctions } from "../../Logic/Factories"
 import createWhich from "../../Logic/Factories/pieces"
 
 //reducer for tiles
@@ -113,10 +114,79 @@ const tilesReducer = (state = createGameBoard(), action) => {
 
             movingPiece.x = tileThatMoveCoordinates.x
             movingPiece.y = tileThatMoveCoordinates.y
+            movingPiece.activePiece = false
             tileThatMove.x = movingPieceCoordinates.x
             tileThatMove.y = movingPieceCoordinates.y
 
             return stateCopy
+        case 'CASTLE':
+            //shiity
+            let poo = [...state]
+
+            let daKing = poo.find((key) => {
+                return key.currentPiece === 'KING' && key.currentPieceColour === action.data.pieceCoordinates.
+                currentPieceColour
+            })
+            const daRooks = [{x: 7, y: 7}, {x: 7, y: 0}, {x: 0, y: 7}, {x: 0, y: 0}].filter(key => key.x === daKing.x)
+            let daRook
+
+            switch(action.data.to.y){
+                case 6: 
+                    daRook = daRooks[0]
+                    break;
+                case 2:
+                    daRook = daRooks[1]
+                    break
+            }
+
+            let tileThatMoves = poo.find((key) => {
+                return key.x === action.data.to.x && key.y === action.data.to.y
+            })
+            let daRook3 = poo.find((key) => {
+                return key.x === daRook.x && key.y === daRook.y
+            })
+            let whereDaRooksGo
+
+            if(daKing.currentPieceColour === 'WHITE'){
+                switch (daRook3.y) {
+                    case 7:
+                        whereDaRooksGo = {x: 7, y: 5}
+                        break;
+                    case 0:
+                        whereDaRooksGo = {x: 7, y: 3}
+                }
+            } else {
+                switch (daRook3.y) {
+                    case 7:
+                        whereDaRooksGo = {x: 0, y: 5}
+                        break;
+                    case 0:
+                        whereDaRooksGo = {x: 0, y: 3}
+                }
+            }
+            whereDaRooksGo = poo.find((key) => {
+                return key.x === whereDaRooksGo.x && key.y === whereDaRooksGo.y
+            })
+
+            const tileThatMoveC = {x: daKing.x, y: daKing.y}
+            const movingPieceC = {x: tileThatMoves.x, y: tileThatMoves.y}
+
+            tileThatMoves.x = tileThatMoveC.x
+            tileThatMoves.y = tileThatMoveC.y
+            daKing.activePiece = false
+            daKing.x = movingPieceC.x
+            daKing.y = movingPieceC.y
+
+            const whereC = {x: whereDaRooksGo.x, y: whereDaRooksGo.y}
+            const IMove = {x: daRook3.x, y: daRook3.y}
+
+            whereDaRooksGo.x = IMove.x
+            whereDaRooksGo.y = IMove.y
+            daRook3.x = whereC.x
+            daRook3.y = whereC.y
+            daRook3.moved = true
+
+            return poo
         default:
             return state
     }
@@ -141,6 +211,12 @@ export const setActivePiece = (content) => {
 export const movePiece = (data) => {
     return {
         type: 'MOVE',
+        data
+    }
+}
+export const castle = (data) => {
+    return {
+        type: 'CASTLE',
         data
     }
 }
