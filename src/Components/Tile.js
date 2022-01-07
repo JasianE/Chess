@@ -15,28 +15,29 @@ import { useSetActivePiece } from '../Redux/Hooks/tileReducerActions'
 import store from '../Redux/store'
 import { useDispatch } from "react-redux"
 import { movePiece, castle } from '../Redux/Reducers/tilesReducer'
+import {timeToSwitch} from '../Redux/Reducers/gameReducer'
 
 //Takes in state to determine which things have an on thing and which thing is on
 //Complicated
 //
-const Tile = ({data, reset}) => {
+const Tile = ({data, reset, gameData}) => {
     const [switch2, setSwitch2] = useState(false)
     const dispatch = useDispatch()
 
     const {x,y,currentPiece,activePiece } = data
-
+ 
     //Set image src
     let pieceThing = ''
-    
     //Loophole to rule of hooks not smart but i
     let content = {}
     if(switch2 === true){
         //bruh i dont care 
-        content = {
+        const ref1 = store.getState().tiles.find((key) => {if(key.activePiece === true){return key}})
+        content = gameData.currentColour === data.currentPieceColour ? {
             x, y, currentPiece
-        }
-
-        if(currentPiece === false){
+        } : null
+        const yesOrNo = ref1 ? ref1.currentPieceColour !== data.currentPieceColour : false
+        if(yesOrNo){
             const myPiece = store.getState().tiles.find((key) => {if(key.activePiece === true){return key}})
             if(myPiece){
                 const state = {
@@ -69,7 +70,8 @@ const Tile = ({data, reset}) => {
                 const theRealG = possibleMoves[0].find((key) => {
                     return key.x === x && key.y === y
                 })
-
+                let ayYo;
+                if(theRealG){ayYo = store.getState().tiles.find(key => key.x === theRealG.x && key.y === theRealG.y)}
                 let castles2 = []
                 
                 if(theRealG){castles2 = [{x: 7, y: 6},{x: 7, y: 2},{x: 0, y: 6},{x: 0, y: 2}]
@@ -84,8 +86,10 @@ const Tile = ({data, reset}) => {
 
                 if(myPiece.currentPiece === 'KING' && castles2 && myPiece.pieceFunctions.times < 2){
                     dispatch(castle(theActualDataNeededForMovePiece))
+                    dispatch(timeToSwitch())
                 } else if(theRealG){
                     dispatch(movePiece(theActualDataNeededForMovePiece))
+                    dispatch(timeToSwitch())
                 }
             }
         }

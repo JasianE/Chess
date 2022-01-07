@@ -1,6 +1,6 @@
 import createGameBoard from "../../Logic/createGameBoard"
-import { kingFunctions } from "../../Logic/Factories"
 import createWhich from "../../Logic/Factories/pieces"
+import { useDispatch } from "react-redux"
 
 //reducer for tiles
 
@@ -83,7 +83,7 @@ const tilesReducer = (state = createGameBoard(), action) => {
             return [...newState]
         case 'ACTIVE':
             const pseudo2 = [...state]
-
+            if(action.data === null){return state}
             if(action.data.currentPiece !== false && action.data.currentPiece !== undefined){
                 let loser = pseudo2.find((key) => {
                     return key.activePiece === true
@@ -117,6 +117,12 @@ const tilesReducer = (state = createGameBoard(), action) => {
             movingPiece.activePiece = false
             tileThatMove.x = movingPieceCoordinates.x
             tileThatMove.y = movingPieceCoordinates.y
+            
+            if(tileThatMove.pieceFunctions){
+                tileThatMove.pieceFunctions.isDead = true
+                tileThatMove.currentPiece = false
+                tileThatMove.currentPieceColour = null
+            }
 
             return stateCopy
         case 'CASTLE':

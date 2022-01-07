@@ -25,6 +25,7 @@ function App() {
   }
 
   const organizedBoard = organizeBoard(gameBoard)
+  const gameState = store.getState().game
 
   let i = 0;
 
@@ -39,7 +40,7 @@ function App() {
             //guccho gang
             organizedBoard.map((key) => {
               i++
-              return <Tile data = {key} reset = {resetTime} key = {i}/>
+              return <Tile data = {key} reset = {resetTime} key = {i} gameData = {gameState}/>
             })
             }
         </div>

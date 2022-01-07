@@ -1,6 +1,6 @@
 //Functions used by every function
 
-const checker = (arr, gameboard, currentLocation=null) => {
+const checker = (arr, gameboard, currentLocation=null, pieceColour) => {
     //Returns first tile that is occupied
     //Calls remover
 
@@ -21,16 +21,20 @@ const checker = (arr, gameboard, currentLocation=null) => {
         const pieceReference = gameboard.find((key1) => {return key1.x === key.x && key1.y === key.y})
         if(pieceReference.currentPiece !== false){return key}
     })
-    return remover(arr, piece)
+    return remover(arr, piece, gameboard, pieceColour)
 }
-const remover = (arr, piece) => {
+const remover = (arr, piece,gameboard, pieceColour) => {
     //epic function names
+    const theRealPieceReference = piece ? gameboard.find(key => key.x === piece.x && key.y === piece.y) : null
+    
     let faker = [...arr]
     faker = faker.slice(faker.indexOf(piece))
     if(arr.indexOf(piece) !== -1){
-        return arr.filter((key) => {
+        const thing = arr.filter((key) => {
             if(faker.indexOf(key) === -1){return key}
         })
+        if(theRealPieceReference.currentPieceColour !== pieceColour){thing.push(piece)}
+        return thing
     }
     return arr
 }
@@ -98,10 +102,10 @@ export const diagonalMovement = () => ({
     
         //Find the first piece that is occupied and records its x and y
         //Delete every move that is greater than or less than (depends on which one) that move
-        topRight1 = checker(topRight1.sort((a,b) => {return a.x - b.x}), gameboard)
-        topLeft1 = checker(topLeft1.sort((a,b) => {return b.x - a.x}), gameboard)
-        topRight2 = checker(topRight2.sort((a,b) => {return b.x - a.x}), gameboard)
-        topLeft2 = checker(topLeft2.sort((a,b) => {return a.x - b.x}), gameboard)
+        topRight1 = checker(topRight1.sort((a,b) => {return a.x - b.x}), gameboard, state.colour)
+        topLeft1 = checker(topLeft1.sort((a,b) => {return b.x - a.x}), gameboard, state.colour)
+        topRight2 = checker(topRight2.sort((a,b) => {return b.x - a.x}), gameboard, state.colour)
+        topLeft2 = checker(topLeft2.sort((a,b) => {return a.x - b.x}), gameboard, state.colour)
         
         return [...topRight1, ...topRight2, ...topLeft1, ...topLeft2]
     }
@@ -129,10 +133,10 @@ export const verticalHorizontalMovement = () => ({
             horizontal1.push({x: state.coordinates.x, y: i})
         }
 
-        vertical1 = checker(vertical1.reverse(), gameboard, {x: state.coordinates.x, y: state.coordinates.y})
-        horizontal1 = checker(horizontal1.reverse(), gameboard, {x: state.coordinates.x, y: state.coordinates.y})
-        vertical2 = checker(vertical2, gameboard, {x: state.coordinates.x, y: state.coordinates.y})
-        horizontal2 = checker(horizontal2, gameboard, {x: state.coordinates.x, y: state.coordinates.y})
+        vertical1 = checker(vertical1.reverse(), gameboard, {x: state.coordinates.x, y: state.coordinates.y}, state.colour)
+        horizontal1 = checker(horizontal1.reverse(), gameboard, {x: state.coordinates.x, y: state.coordinates.y}, state.colour)
+        vertical2 = checker(vertical2, gameboard, {x: state.coordinates.x, y: state.coordinates.y}, state.colour)
+        horizontal2 = checker(horizontal2, gameboard, {x: state.coordinates.x, y: state.coordinates.y}, state.colour)
 
         if(poo){this.moved = true} 
 
