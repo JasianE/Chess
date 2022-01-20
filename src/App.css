@@ -1,7 +1,11 @@
 .App {
   text-align: center;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  align-self: center;
 }
 .gameBoardContainer{
+  grid-column: 2/3;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);

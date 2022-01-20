@@ -123,6 +123,7 @@ const tilesReducer = (state = createGameBoard(), action) => {
                 tileThatMove.currentPiece = false
                 tileThatMove.currentPieceColour = null
             }
+            movingPiece.pieceFunctions.justMoved = true
 
             return stateCopy
         case 'CASTLE':
@@ -193,6 +194,11 @@ const tilesReducer = (state = createGameBoard(), action) => {
             daRook3.moved = true
 
             return poo
+        case 'REMOVE':
+            const fakeState = [...state]
+            const piece = fakeState.find(key => key.x === action.data.x && key.y === action.data.y)
+            piece.pieceFunctions.justMoved = false
+            return fakeState
         default:
             return state
     }
@@ -223,6 +229,12 @@ export const movePiece = (data) => {
 export const castle = (data) => {
     return {
         type: 'CASTLE',
+        data
+    }
+}
+export const removeState = (data) => {
+    return {
+        type: 'REMOVE',
         data
     }
 }
