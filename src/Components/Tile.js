@@ -15,7 +15,7 @@ import { useSetActivePiece } from '../Redux/Hooks/tileReducerActions'
 import store from '../Redux/store'
 import { useDispatch } from "react-redux"
 import { movePiece, castle, removeState } from '../Redux/Reducers/tilesReducer'
-import { timeToSwitch, check, checkRemoval } from '../Redux/Reducers/gameReducer'
+import { timeToSwitch, check, checkRemoval, gameOver } from '../Redux/Reducers/gameReducer'
 
 //Curent bugs
 //Checking queen piereces through check on why
@@ -32,13 +32,16 @@ const Tile = ({data, reset, gameData}) => {
 
     const game = store.getState().game
     const checks = [game.whiteCheck, game.blackCheck]
-    if(checks[0] && currentPiece === 'KING' && data.currentPieceColour === 'WHITE'){console.log('hello')}
 
     if(checks[0] && currentPiece === 'KING' && data.currentPieceColour === 'WHITE'){
         if(!data.pieceFunctions.inCheck(store.getState().tiles, data)){
             dispatch(checkRemoval(data.currentPieceColour))
         }
-    } 
+    } else if(checks[1] && currentPiece === 'KING' && data.currentPieceColour === 'BLACK'){
+        if(!data.pieceFunctions.inCheck(store.getState().tiles, data)){
+            dispatch(checkRemoval(data.currentPieceColour))
+        }
+    }
 
     const pieceThatJustMoved = store.getState().tiles.find((key) => {
         if(key.pieceFunctions){
@@ -94,16 +97,17 @@ const Tile = ({data, reset, gameData}) => {
     }
     //Set image src
     let pieceThing = ''
-    //Loophole to rule of hooks not smart but i
+
     let content = {}
     if(switch2 === true){
-        //bruh i dont care 
+        //Ref 1 is the piece that just moved to get here used by finding the piece that is activepiece
         const ref1 = store.getState().tiles.find((key) => {if(key.activePiece === true){return key}})
         content = gameData.currentColour === data.currentPieceColour ? {
             x, y, currentPiece
         } : null
         const yesOrNo = ref1 ? ref1.currentPieceColour !== data.currentPieceColour : false
         if(yesOrNo){
+            
             const myPiece = store.getState().tiles.find((key) => {if(key.activePiece === true){return key}})
             if(myPiece){
                 const state = {
@@ -150,58 +154,69 @@ const Tile = ({data, reset, gameData}) => {
                     pieceType: myPiece.currentPiece,
                     to: theRealG ? theRealG : null
                 }
-                if(store.getState().game.whiteCheck){
+
+                if(checks[0] && ref1.currentPieceColour === 'WHITE'){
                     const kingGuy = store.getState().tiles.find(key => key.currentPiece === 'KING' && 
                     key.currentPieceColour === 'WHITE')
         
                     const possibleMoves = kingGuy.pieceFunctions.getOutOfCheck(kingGuy, store.getState().tiles, 
                     store.getState().game.checker[0])
+
+                    if(possibleMoves === true){
+                        dispatch(gameOver('WHITE'))
+                    } else {
+                        const kingMoves = possibleMoves.shift()
+
+                        if(myPiece.currentPiece === 'KING' && myPiece.currentPieceColour === 'WHITE' && theRealG){
+                            if(kingMoves.find(key => key.x === theRealG.x && key.y === theRealG.y)){
+                                dispatch(movePiece(theActualDataNeededForMovePiece))
+                                dispatch(timeToSwitch())
+                            }
+                        }
+
+                        //checks if there is actually to because i write shit code then checks if possibles moves (block check)
+                        //Found in the ActualDatnanedrof piece the rEAL g and then ifit is boom mastapiece
+                        if(theActualDataNeededForMovePiece.to){
+                            const laPiece = store.getState().game.checker[0]
+                            if((possibleMoves.find(key => key.x === theActualDataNeededForMovePiece.to.x 
+                                && key.y === theActualDataNeededForMovePiece.to.y)) || laPiece.x === theRealG.x && laPiece.y ===
+                                theRealG.y){
+                                dispatch(movePiece(theActualDataNeededForMovePiece))
+                                dispatch(timeToSwitch())
+                            }
+                        }
+                    }
         
-                    const kingMoves = possibleMoves.shift()
-
-                    if(myPiece.currentPiece === 'KING' && myPiece.currentPieceColour === 'WHITE' && theRealG){
-                        if(kingMoves.find(key => key.x === theRealG.x && key.y === theRealG.y)){
-                            dispatch(movePiece(theActualDataNeededForMovePiece))
-                            dispatch(timeToSwitch())
-                        }
-                    }
-
-                    //checks if there is actually to because i write shit code then checks if possibles moves (block check)
-                    //Found in the ActualDatnanedrof piece the rEAL g and then ifit is boom mastapiece
-                    if(theActualDataNeededForMovePiece.to){
-                        const laPiece = store.getState().game.checker[0]
-                        if((possibleMoves.find(key => key.x === theActualDataNeededForMovePiece.to.x 
-                            && key.y === theActualDataNeededForMovePiece.to.y)) || laPiece.x === theRealG.x && laPiece.y ===
-                            theRealG.y){
-                            dispatch(movePiece(theActualDataNeededForMovePiece))
-                            dispatch(timeToSwitch())
-                        }
-                    }
-                } else if(store.getState().game.blackCheck){
+                } else if(checks[1] && ref1.currentPieceColour === 'BLACK'){
                     const kingGuy = store.getState().tiles.find(key => key.currentPiece === 'KING' && 
                     key.currentPieceColour === 'BLACK')
         
                     const possibleMoves = kingGuy.pieceFunctions.getOutOfCheck(kingGuy, store.getState().tiles, 
                     store.getState().game.checker[0])
+
+                    if(possibleMoves === true){
+                        dispatch(gameOver('BLACK'))
+                    } else {
+                        const kingMoves = possibleMoves.shift()
+
+                        if(myPiece.currentPiece === 'KING' && myPiece.currentPieceColour === 'BLACK' && theRealG){
+                            if(kingMoves.find(key => key.x === theRealG.x && key.y === theRealG.y)){
+                                dispatch(movePiece(theActualDataNeededForMovePiece))
+                                dispatch(timeToSwitch())
+                            }
+                        }
+
+                        if(theActualDataNeededForMovePiece.to){
+                            const laPiece = store.getState().game.checker[0]
+                            if((possibleMoves.find(key => key.x === theActualDataNeededForMovePiece.to.x 
+                                && key.y === theActualDataNeededForMovePiece.to.y)) || laPiece.x === theRealG.x && laPiece.y ===
+                                theRealG.y){
+                                dispatch(movePiece(theActualDataNeededForMovePiece))
+                                dispatch(timeToSwitch())
+                            }
+                        }
+                    }
         
-                    const kingMoves = possibleMoves.shift()
-
-                    if(myPiece.currentPiece === 'KING' && myPiece.currentPieceColour === 'BLACK' && theRealG){
-                        if(kingMoves.find(key => key.x === theRealG.x && key.y === theRealG.y)){
-                            dispatch(movePiece(theActualDataNeededForMovePiece))
-                            dispatch(timeToSwitch())
-                        }
-                    }
-
-                    if(theActualDataNeededForMovePiece.to){
-                        const laPiece = store.getState().game.checker[0]
-                        if((possibleMoves.find(key => key.x === theActualDataNeededForMovePiece.to.x 
-                            && key.y === theActualDataNeededForMovePiece.to.y)) || laPiece.x === theRealG.x && laPiece.y ===
-                            theRealG.y){
-                            dispatch(movePiece(theActualDataNeededForMovePiece))
-                            dispatch(timeToSwitch())
-                        }
-                    }
                     //mastapiece put this in separate function so theres no duplicat code 
                     //ty
                 } else if(myPiece.currentPiece === 'KING' && castles2 && myPiece.pieceFunctions.times < 2 
@@ -250,6 +265,8 @@ const Tile = ({data, reset, gameData}) => {
     }
     return(
         <div className= 'tile'>
+            <h2>{x}</h2>
+            <h2>{y}</h2>
             <img className = {activePiece ? 'thing' : 'piece'} src = {pieceThing} onClick={() => {setSwitch2(true)}}></img>
         </div>
     )

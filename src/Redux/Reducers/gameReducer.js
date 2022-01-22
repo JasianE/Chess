@@ -1,5 +1,5 @@
 const gameReducer = (state = {currentColour: 'WHITE', whitePoints: 0, blackPoints: 0, 
-    whiteCheck: false, blackCheck: false, checker: []}, action) => {
+    whiteCheck: false, blackCheck: false, checker: [], gameOver: null}, action) => {
     switch (action.type) {
         case 'SWITCH':
             const copy = {...state}
@@ -18,6 +18,9 @@ const gameReducer = (state = {currentColour: 'WHITE', whitePoints: 0, blackPoint
                 state.blackCheck = false
             }
             state.checker = []
+            return state
+        case 'GAMEOVER':
+            state.gameOver = action.data
             return state
         default:
             return state
@@ -40,6 +43,13 @@ export const check = (data) => {
 export const checkRemoval = (data) => {
     return {
         type: 'CHECKREMOVAL',
+        data
+    }
+}
+
+export const gameOver = (data) => {
+    return {
+        type: 'GAMEOVER',
         data
     }
 }

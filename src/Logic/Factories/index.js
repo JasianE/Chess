@@ -127,7 +127,7 @@ export const verticalHorizontalMovement = () => ({
         let vertical2 = []
         let horizontal2 = []
         
-        for(let i = 0; i < 8; i++){
+        for(let i = 0; i < state.coordinates.x; i++){
             vertical1.push({x: i, y: state.coordinates.y})
         }
         for(let i = state.coordinates.x; i < 8; i++){
@@ -136,7 +136,7 @@ export const verticalHorizontalMovement = () => ({
         for(let i = state.coordinates.y; i < 8; i++){
             horizontal2.push({x: state.coordinates.x, y: i})
         }
-        for(let i = 0; i < 8; i++){
+        for(let i = 0; i < state.coordinates.y; i++){
             horizontal1.push({x: state.coordinates.x, y: i})
         }
         vertical1 = checker(vertical1.reverse(), gameboard, {x: state.coordinates.x, y: state.coordinates.y}, state.colour)
@@ -520,6 +520,38 @@ export const kingFunctions = () => ({
             
         }
         
-        return moves
+        let checkmated = true
+        const everyPiece = gameboard.filter(key => key.currentPieceColour === 'WHITE').map((key) => {
+            const state = {
+                coordinates: {x: key.x, y: key.y},
+                colour: key.currentPieceColour,
+                moved: true
+            } 
+            switch(key.currentPiece){
+                case 'PAWN':
+                    return key.pieceFunctions.pawnMoves(state, gameboard)
+                case 'KNIGHT':
+                    return key.pieceFunctions.knightMoves(state, gameboard)
+                case 'QUEEN':
+                    return key.pieceFunctions.queenMoves(state, gameboard)
+                case 'BISHOP':
+                    return key.pieceFunctions.diagonalMoves(state, gameboard)
+                case 'ROOK':
+                    return key.pieceFunctions.verticalHorizontalMoves(state, gameboard)
+            }
+        })
+        for(let i = 0 ; i < everyPiece.length ; i++){
+            for(let j = 0 ; j < everyPiece.length ; j++){
+                if(everyPiece[i] && everyPiece[i][j]){
+                    if(moves.find(key => key.x === everyPiece[i][j].x && key.y === everyPiece[i][j].y) && 
+                    (everyPiece[i][j].x !== this.coordinates.x && everyPiece[i][j].y !== this.coordinates.y)){
+                        checkmated = false;
+                        i = 1000
+                    }
+                }
+            }
+        }
+        console.log(checkmated)
+        return checkmated ? checkmated : moves 
     }
 })

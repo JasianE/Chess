@@ -33,7 +33,7 @@ function App() {
   return (
     <div className="App">
         <div className = 'gameBoardContainer'>
-            {
+            { store.getState().game.gameOver !== null ? <h1>{store.getState().game.gameOver} lost lmao</h1> :
             //gameBoard.map(key => key)
             //Gets gameboard from state after actions have been done on it
             //game board produced by createGameBoard will be used by setupGameBoard to act as initial state
