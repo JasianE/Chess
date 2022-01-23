@@ -517,41 +517,51 @@ export const kingFunctions = () => ({
                     }
                 }
             }
-            
         }
-        
+        moves.push({x: attackPiece.x, y: attackPiece.y})
         let checkmated = true
-        const everyPiece = gameboard.filter(key => key.currentPieceColour === 'WHITE').map((key) => {
+        let realEveryPiece = []
+        const everyPiece = gameboard.filter(key => key.currentPieceColour === state.currentPieceColour).map((key) => {
             const state = {
                 coordinates: {x: key.x, y: key.y},
                 colour: key.currentPieceColour,
                 moved: true
             } 
+            let container = []
             switch(key.currentPiece){
                 case 'PAWN':
-                    return key.pieceFunctions.pawnMoves(state, gameboard)
+                    container = key.pieceFunctions.pawnMoves(state, gameboard)
+                    break;
                 case 'KNIGHT':
-                    return key.pieceFunctions.knightMoves(state, gameboard)
+                    container = key.pieceFunctions.knightMoves(state, gameboard)
+                    break;
                 case 'QUEEN':
-                    return key.pieceFunctions.queenMoves(state, gameboard)
+                    container = key.pieceFunctions.queenMoves(state, gameboard)
+                    break;
                 case 'BISHOP':
-                    return key.pieceFunctions.diagonalMoves(state, gameboard)
+                    container = key.pieceFunctions.diagonalMoves(state, gameboard)
+                    break;
                 case 'ROOK':
-                    return key.pieceFunctions.verticalHorizontalMoves(state, gameboard)
+                    container = key.pieceFunctions.verticalHorizontalMoves(state, gameboard)
+                    break;
+            }
+            realEveryPiece.push(...container)
+            return container
+        })
+        
+        moves[0] = moves[0].filter((key) => {
+            const poopo = gameboard.find(pee => pee.x === key.x && pee.y === key.y)
+            if(poopo.currentPiece === false){
+                return key
             }
         })
-        for(let i = 0 ; i < everyPiece.length ; i++){
-            for(let j = 0 ; j < everyPiece.length ; j++){
-                if(everyPiece[i] && everyPiece[i][j]){
-                    if(moves.find(key => key.x === everyPiece[i][j].x && key.y === everyPiece[i][j].y) && 
-                    (everyPiece[i][j].x !== this.coordinates.x && everyPiece[i][j].y !== this.coordinates.y)){
-                        checkmated = false;
-                        i = 1000
-                    }
-                }
+        if(moves[0].length !== 0){checkmated = false}
+        for(let i = 0; i < realEveryPiece.length; i++){
+            if(moves.find(key => key.x === realEveryPiece[i].x && key.y === realEveryPiece[i].y)){
+                i = 1000
+                checkmated = false
             }
         }
-        console.log(checkmated)
         return checkmated ? checkmated : moves 
     }
 })
