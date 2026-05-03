@@ -15,19 +15,15 @@ const checker = (arr, gameboard, currentLocation=null, pieceColour) => {
         let where = 0
         const res = arr.find((key) => {
             where = where + 1
-            if(key.x === currentLocation.x && key.y === currentLocation.y){
-                return key
-            }
-            return null
+            return key.x === currentLocation.x && key.y === currentLocation.y
         })
         if(res){arr.splice(where - 1, 1)}
     }
     //Find the reference to the piece in gamebaord
   
     const piece = arr.find((key) => {
-        const pieceReference = gameboard.find((key1) => {return key1.x === key.x && key1.y === key.y})
-        if(pieceReference.currentPiece !== false){return key}
-        return null
+        const pieceReference = gameboard.find(key1 => key1.x === key.x && key1.y === key.y)
+        return pieceReference.currentPiece !== false
     })
     return remover(arr, piece, gameboard, pieceColour)
 }
@@ -38,10 +34,7 @@ const remover = (arr, piece,gameboard, pieceColour) => {
     let faker = [...arr]
     faker = faker.slice(faker.indexOf(piece))
     if(arr.indexOf(piece) !== -1){
-        const thing = arr.filter((key) => {
-            if(faker.indexOf(key) === -1){return key}
-            return null
-        })
+        const thing = arr.filter(key => faker.indexOf(key) === -1)
         if(theRealPieceReference.currentPieceColour !== pieceColour){thing.push(piece)}
         return thing
     }
@@ -387,19 +380,13 @@ export const kingFunctions = () => ({
             }
         }
 
-        return {checks: potentialChecks.filter((key) => {
-            if(realCoveredTiles.find(poop => poop.x === key.x && poop.y === key.y)){return key}
-            return null
-        }), moves: potentialChecks}
+        return {checks: potentialChecks.filter(key => realCoveredTiles.find(poop => poop.x === key.x && poop.y === key.y)), moves: potentialChecks}
     },
     kingMoves: function(state, gameboard){
         //Uses kingchecker to determine if you an movel lmao
         const {checks, moves} = this.kingChecker(gameboard, {x: state.coordinates.x, y: state.coordinates.y, 
             colour: state.colour})
-        let doubleDouble = moves.filter((key) => {
-            if(!checks.find(poop => poop.x === key.x && poop.y === key.y)){return key}
-            return null
-        })
+        let doubleDouble = moves.filter(key => !checks.find(poop => poop.x === key.x && poop.y === key.y))
 
         this.moved = true
         this.times = this.times + 1
@@ -528,10 +515,7 @@ export const kingFunctions = () => ({
         
         moves[0] = moves[0].filter((key) => {
             const poopo = gameboard.find(pee => pee.x === key.x && pee.y === key.y)
-            if(poopo.currentPiece === false){
-                return key
-            }
-            return null
+            return poopo.currentPiece === false
         })
         if(moves[0].length !== 0){checkmated = false}
         for(let i = 0; i < realEveryPiece.length; i++){

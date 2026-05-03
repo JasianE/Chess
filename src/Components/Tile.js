@@ -43,12 +43,7 @@ const Tile = ({data, reset, gameData}) => {
         }
     }
 
-    const pieceThatJustMoved = store.getState().tiles.find((key) => {
-        if(key.pieceFunctions){
-            return key.pieceFunctions.justMoved === true
-        }
-        return null
-    })
+    const pieceThatJustMoved = store.getState().tiles.find(key => key.pieceFunctions && key.pieceFunctions.justMoved === true)
 
     if(pieceThatJustMoved){
         dispatch(removeState(pieceThatJustMoved))
