@@ -43,11 +43,7 @@ const Tile = ({data, reset, gameData}) => {
         }
     }
 
-    const pieceThatJustMoved = store.getState().tiles.find((key) => {
-        if(key.pieceFunctions){
-            return key.pieceFunctions.justMoved === true
-        }
-    })
+    const pieceThatJustMoved = store.getState().tiles.find(key => key.pieceFunctions && key.pieceFunctions.justMoved === true)
 
     if(pieceThatJustMoved){
         dispatch(removeState(pieceThatJustMoved))
@@ -78,6 +74,8 @@ const Tile = ({data, reset, gameData}) => {
             case 'KING':
                 possibleMoves.push(pieceThatJustMoved.pieceFunctions.kingMoves(state, store.getState().tiles))
                 break
+            default:
+                break
         }
         const realPieces = possibleMoves[0] ? possibleMoves[0].map
         (key => store.getState().tiles.find(pee => pee.x === key.x && pee.y === key.y)) :
@@ -101,14 +99,14 @@ const Tile = ({data, reset, gameData}) => {
     let content = {}
     if(switch2 === true){
         //Ref 1 is the piece that just moved to get here used by finding the piece that is activepiece
-        const ref1 = store.getState().tiles.find((key) => {if(key.activePiece === true){return key}})
+        const ref1 = store.getState().tiles.find(key => key.activePiece === true)
         content = gameData.currentColour === data.currentPieceColour ? {
             x, y, currentPiece
         } : null
         const yesOrNo = ref1 ? ref1.currentPieceColour !== data.currentPieceColour : false
         if(yesOrNo){
             
-            const myPiece = store.getState().tiles.find((key) => {if(key.activePiece === true){return key}})
+            const myPiece = store.getState().tiles.find(key => key.activePiece === true)
             if(myPiece){
                 const state = {
                     coordinates: {x:myPiece.x, y: myPiece.y},
@@ -137,12 +135,12 @@ const Tile = ({data, reset, gameData}) => {
                     case 'KING':
                         possibleMoves.push(myPiece.pieceFunctions.kingMoves(state, store.getState().tiles))
                         break
+                    default:
+                        break
                 }
                 const theRealG = possibleMoves[0].find((key) => {
                     return key.x === x && key.y === y
                 })
-                let ayYo;
-                if(theRealG){ayYo = store.getState().tiles.find(key => key.x === theRealG.x && key.y === theRealG.y)}
                 let castles2 = []
                 
                 if(theRealG){castles2 = [{x: 7, y: 6},{x: 7, y: 2},{x: 0, y: 6},{x: 0, y: 2}]
@@ -179,8 +177,8 @@ const Tile = ({data, reset, gameData}) => {
                         if(theActualDataNeededForMovePiece.to){
                             const laPiece = store.getState().game.checker[0]
                             if((possibleMoves.find(key => key.x === theActualDataNeededForMovePiece.to.x 
-                                && key.y === theActualDataNeededForMovePiece.to.y)) || laPiece.x === theRealG.x && laPiece.y ===
-                                theRealG.y){
+                                && key.y === theActualDataNeededForMovePiece.to.y)) || (laPiece.x === theRealG.x && laPiece.y ===
+                                theRealG.y)){
                                 dispatch(movePiece(theActualDataNeededForMovePiece))
                                 dispatch(timeToSwitch())
                             }
@@ -209,8 +207,8 @@ const Tile = ({data, reset, gameData}) => {
                         if(theActualDataNeededForMovePiece.to){
                             const laPiece = store.getState().game.checker[0]
                             if((possibleMoves.find(key => key.x === theActualDataNeededForMovePiece.to.x 
-                                && key.y === theActualDataNeededForMovePiece.to.y)) || laPiece.x === theRealG.x && laPiece.y ===
-                                theRealG.y){
+                                && key.y === theActualDataNeededForMovePiece.to.y)) || (laPiece.x === theRealG.x && laPiece.y ===
+                                theRealG.y)){
                                 dispatch(movePiece(theActualDataNeededForMovePiece))
                                 dispatch(timeToSwitch())
                             }
@@ -261,13 +259,15 @@ const Tile = ({data, reset, gameData}) => {
 
         case 'BISHOP':
             pieceThing = colour ? bishopW : bishopB
-            break;           
+            break;
+        default:
+            break;
     }
     return(
         <div className= 'tile'>
             <h2>{x}</h2>
             <h2>{y}</h2>
-            <img className = {activePiece ? 'thing' : 'piece'} src = {pieceThing} onClick={() => {setSwitch2(true)}}></img>
+            <img className = {activePiece ? 'thing' : 'piece'} src = {pieceThing} alt="" onClick={() => {setSwitch2(true)}}></img>
         </div>
     )
 }
