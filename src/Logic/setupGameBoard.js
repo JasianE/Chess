@@ -1,4 +1,4 @@
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from "react-redux"
 import { receiveState, setupBoard } from '../Redux/Reducers/tilesReducer'
 //Setups gameboard so starting tiles have things
 

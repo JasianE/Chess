@@ -79,6 +79,8 @@ const createWhich = (state) => {
         case 'KING':
             const king = createKing(state)
             return king
+        default:
+            return null
     }
 }
 

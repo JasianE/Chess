@@ -35,6 +35,8 @@ export const organizeBoard = (board) => {
                 break;
             case 7:
                 row8.push(board[i])
+                break;
+            default:
                 break;  
         }
     }

@@ -18,6 +18,7 @@ const checker = (arr, gameboard, currentLocation=null, pieceColour) => {
             if(key.x === currentLocation.x && key.y === currentLocation.y){
                 return key
             }
+            return null
         })
         if(res){arr.splice(where - 1, 1)}
     }
@@ -26,6 +27,7 @@ const checker = (arr, gameboard, currentLocation=null, pieceColour) => {
     const piece = arr.find((key) => {
         const pieceReference = gameboard.find((key1) => {return key1.x === key.x && key1.y === key.y})
         if(pieceReference.currentPiece !== false){return key}
+        return null
     })
     return remover(arr, piece, gameboard, pieceColour)
 }
@@ -38,6 +40,7 @@ const remover = (arr, piece,gameboard, pieceColour) => {
     if(arr.indexOf(piece) !== -1){
         const thing = arr.filter((key) => {
             if(faker.indexOf(key) === -1){return key}
+            return null
         })
         if(theRealPieceReference.currentPieceColour !== pieceColour){thing.push(piece)}
         return thing
@@ -193,19 +196,11 @@ export const pawnMovement = () => ({
                 const adjacents = [{x: state.coordinates.x-1, y: state.coordinates.y - 1}, 
                     {x: state.coordinates.x-1, y: state.coordinates.y + 1}]
                 if(adjacents[0].x > -1 && adjacents[0].x < 8 && adjacents[0].y < 8 && adjacents[0].y > -1){
-                    const adjacent1 = currentBoard.find((key) => {
-                        if(key.x === adjacents[0].x && key.y === adjacents[0].y){
-                            return key
-                        }
-                    })
+                    const adjacent1 = currentBoard.find(key => key.x === adjacents[0].x && key.y === adjacents[0].y)
                     if(adjacent1.currentPieceColour === 'BLACK'){possibleMoves.push(adjacent1)}
                 }
                 if(adjacents[1].x > -1 && adjacents[1].x < 8 && adjacents[1].y < 8 && adjacents[1].y > -1){
-                    const adjacent2 = currentBoard.find((key) => {
-                        if(key.x === adjacents[1].x && key.y === adjacents[1].y){
-                            return key
-                        }
-                    })
+                    const adjacent2 = currentBoard.find(key => key.x === adjacents[1].x && key.y === adjacents[1].y)
                     if(adjacent2.currentPieceColour === 'BLACK'){possibleMoves.push(adjacent2)}
                 }
 
@@ -214,19 +209,11 @@ export const pawnMovement = () => ({
                     const adjacents = [{x: state.coordinates.x-1, y: state.coordinates.y - 1}, 
                         {x: state.coordinates.x-1, y: state.coordinates.y + 1}]
                     if(adjacents[0].x > -1 && adjacents[0].x < 8 && adjacents[0].y < 8 && adjacents[0].y > -1){
-                        const adjacent1 = currentBoard.find((key) => {
-                            if(key.x === adjacents[0].x && key.y === adjacents[0].y){
-                                return key
-                            }
-                        })
+                        const adjacent1 = currentBoard.find(key => key.x === adjacents[0].x && key.y === adjacents[0].y)
                         if(adjacent1.currentPieceColour === 'BLACK'){possibleMoves.push(adjacent1)}
                     }
                     if(adjacents[1].x > -1 && adjacents[1].x < 8 && adjacents[1].y < 8 && adjacents[1].y > -1){
-                        const adjacent2 = currentBoard.find((key) => {
-                            if(key.x === adjacents[1].x && key.y === adjacents[1].y){
-                                return key
-                            }
-                        })
+                        const adjacent2 = currentBoard.find(key => key.x === adjacents[1].x && key.y === adjacents[1].y)
                         if(adjacent2.currentPieceColour === 'BLACK'){possibleMoves.push(adjacent2)}
                     }
                     const up = {x: state.coordinates.x - 1, y: state.coordinates.y}
@@ -255,19 +242,11 @@ export const pawnMovement = () => ({
                     {x: state.coordinates.x+1, y: state.coordinates.y + 1}]
                 
                 if(adjacents[0].x > -1 && adjacents[0].x < 8 && adjacents[0].y < 8 && adjacents[0].y > -1){
-                    const adjacent1 = currentBoard.find((key) => {
-                        if(key.x === adjacents[0].x && key.y === adjacents[0].y){
-                            return key
-                        }
-                    })
+                    const adjacent1 = currentBoard.find(key => key.x === adjacents[0].x && key.y === adjacents[0].y)
                     if(adjacent1.currentPieceColour === 'WHITE'){possibleMoves.push(adjacent1)}
                 }
                 if(adjacents[1].x > -1 && adjacents[1].x < 8 && adjacents[1].y < 8 && adjacents[1].y > -1){
-                    const adjacent2 = currentBoard.find((key) => {
-                        if(key.x === adjacents[1].x && key.y === adjacents[1].y){
-                            return key
-                        }
-                    })
+                    const adjacent2 = currentBoard.find(key => key.x === adjacents[1].x && key.y === adjacents[1].y)
                     if(adjacent2.currentPieceColour === 'WHITE'){possibleMoves.push(adjacent2)}
                 }
             } else {
@@ -276,19 +255,11 @@ export const pawnMovement = () => ({
                         {x: state.coordinates.x+1, y: state.coordinates.y + 1}]
                     
                     if(adjacents[0].x > -1 && adjacents[0].x < 8 && adjacents[0].y < 8 && adjacents[0].y > -1){
-                        const adjacent1 = currentBoard.find((key) => {
-                            if(key.x === adjacents[0].x && key.y === adjacents[0].y){
-                                return key
-                            }
-                        })
+                        const adjacent1 = currentBoard.find(key => key.x === adjacents[0].x && key.y === adjacents[0].y)
                         if(adjacent1.currentPieceColour === 'WHITE'){possibleMoves.push(adjacent1)}
                     }
                     if(adjacents[1].x > -1 && adjacents[1].x < 8 && adjacents[1].y < 8 && adjacents[1].y > -1){
-                        const adjacent2 = currentBoard.find((key) => {
-                            if(key.x === adjacents[1].x && key.y === adjacents[1].y){
-                                return key
-                            }
-                        })
+                        const adjacent2 = currentBoard.find(key => key.x === adjacents[1].x && key.y === adjacents[1].y)
                         if(adjacent2.currentPieceColour === 'WHITE'){possibleMoves.push(adjacent2)}
                     }
                     const up = {x: state.coordinates.x + 1, y: state.coordinates.y}
@@ -405,6 +376,8 @@ export const kingFunctions = () => ({
                     return key.pieceFunctions.pawnMoves(state, gameboard, true)
                 case 'KNIGHT':
                     return key.pieceFunctions.knightMoves(state)
+                default:
+                    return null
             }
         })
 
@@ -415,7 +388,8 @@ export const kingFunctions = () => ({
         }
 
         return {checks: potentialChecks.filter((key) => {
-            if(realCoveredTiles.find(poop => poop.x === key.x && poop.y === key.y)){return key} 
+            if(realCoveredTiles.find(poop => poop.x === key.x && poop.y === key.y)){return key}
+            return null
         }), moves: potentialChecks}
     },
     kingMoves: function(state, gameboard){
@@ -424,6 +398,7 @@ export const kingFunctions = () => ({
             colour: state.colour})
         let doubleDouble = moves.filter((key) => {
             if(!checks.find(poop => poop.x === key.x && poop.y === key.y)){return key}
+            return null
         })
 
         this.moved = true
@@ -521,7 +496,7 @@ export const kingFunctions = () => ({
         moves.push({x: attackPiece.x, y: attackPiece.y})
         let checkmated = true
         let realEveryPiece = []
-        const everyPiece = gameboard.filter(key => key.currentPieceColour === state.currentPieceColour).map((key) => {
+        gameboard.filter(key => key.currentPieceColour === state.currentPieceColour).map((key) => {
             const state = {
                 coordinates: {x: key.x, y: key.y},
                 colour: key.currentPieceColour,
@@ -544,6 +519,8 @@ export const kingFunctions = () => ({
                 case 'ROOK':
                     container = key.pieceFunctions.verticalHorizontalMoves(state, gameboard)
                     break;
+                default:
+                    break;
             }
             realEveryPiece.push(...container)
             return container
@@ -554,6 +531,7 @@ export const kingFunctions = () => ({
             if(poopo.currentPiece === false){
                 return key
             }
+            return null
         })
         if(moves[0].length !== 0){checkmated = false}
         for(let i = 0; i < realEveryPiece.length; i++){

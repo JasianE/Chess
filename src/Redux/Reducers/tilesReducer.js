@@ -1,6 +1,5 @@
 import createGameBoard from "../../Logic/createGameBoard"
 import createWhich from "../../Logic/Factories/pieces"
-import { useDispatch } from "react-redux"
 
 //reducer for tiles
 
@@ -93,9 +92,7 @@ const tilesReducer = (state = createGameBoard(), action) => {
                 }
 
                 const piece = pseudo2.find((key) => {
-                    if(key.x === action.data.x && key.y === action.data.y && key.currentPiece === action.data.currentPiece){
-                        return key
-                    }
+                    return key.x === action.data.x && key.y === action.data.y && key.currentPiece === action.data.currentPiece
                 })
                 piece.activePiece = true
             }
@@ -131,8 +128,7 @@ const tilesReducer = (state = createGameBoard(), action) => {
             let poo = [...state]
 
             let daKing = poo.find((key) => {
-                return key.currentPiece === 'KING' && key.currentPieceColour === action.data.pieceCoordinates.
-                currentPieceColour
+                return key.currentPiece === 'KING' && key.currentPieceColour === action.data.pieceCoordinates.currentPieceColour
             })
             const daRooks = [{x: 7, y: 7}, {x: 7, y: 0}, {x: 0, y: 7}, {x: 0, y: 0}].filter(key => key.x === daKing.x)
             let daRook
@@ -143,6 +139,8 @@ const tilesReducer = (state = createGameBoard(), action) => {
                     break;
                 case 2:
                     daRook = daRooks[1]
+                    break
+                default:
                     break
             }
 
@@ -161,6 +159,9 @@ const tilesReducer = (state = createGameBoard(), action) => {
                         break;
                     case 0:
                         whereDaRooksGo = {x: 7, y: 3}
+                        break
+                    default:
+                        break
                 }
             } else {
                 switch (daRook3.y) {
@@ -169,6 +170,9 @@ const tilesReducer = (state = createGameBoard(), action) => {
                         break;
                     case 0:
                         whereDaRooksGo = {x: 0, y: 3}
+                        break
+                    default:
+                        break
                 }
             }
             whereDaRooksGo = poo.find((key) => {

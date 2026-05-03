@@ -1,6 +1,5 @@
 import './App.css';
-import useSetupGameBoard from './Logic/setupGameBoard';
-import {useSelector, useDispatch} from 'react-redux'
+import {useDispatch} from 'react-redux'
 import Tile from './Components/Tile';
 import store from './Redux/store';
 import React, { useEffect, useState } from 'react';
@@ -14,7 +13,7 @@ function App() {
 
   useEffect(() => {
     dispatch(setupBoard())
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     setGameboard(store.getState().tiles)
